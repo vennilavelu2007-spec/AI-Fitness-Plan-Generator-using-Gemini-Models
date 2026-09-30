@@ -1,0 +1,33 @@
+The core functionalities of the application are developed by implementing the main user interface, processing user inputs, connecting the backend with the database, and providing the required application features. Proper validation, error handling, authentication, and API integration are also included to ensure reliable operation.
+
+Example Coding:
+
+# Core functionality example
+
+def add_user(name, email):
+    if not name or not email:
+        return "Name and email are required"
+
+    user = {
+        "name": name,
+        "email": email
+    }
+
+    return user
+
+
+def get_user(user):
+    return user
+
+
+# Create user
+new_user = add_user("Vennila", "vennila@example.com")
+
+# Display user
+print("User Details:")
+print(get_user(new_user))
+
+Output:
+
+User Details:
+{'name': 'Vennila', 'email': 'vennila@example.com'}
