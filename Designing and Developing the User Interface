@@ -1,0 +1,260 @@
+The user interface is designed to provide a simple, responsive, and user-friendly experience. It includes input fields, buttons, navigation elements, status messages, and result sections. The frontend communicates with the FastAPI backend through REST API requests. Form validation and error messages are included to help users enter correct information and understand the system response.
+
+Coding — app/templates/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Application</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>My Application</h1>
+        <p>Simple and user-friendly interface</p>
+    </header>
+
+    <main class="container">
+
+        <section class="card">
+
+            <h2>User Input</h2>
+
+            <form id="userForm">
+
+                <label for="name">Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your name"
+                    required
+                >
+
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+                <label for="message">Message</label>
+                <textarea
+                    id="message"
+                    placeholder="Enter your message"
+                    rows="5"
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Submit
+                </button>
+
+            </form>
+
+            <div id="status"></div>
+
+        </section>
+
+        <section class="card result-card">
+
+            <h2>Result</h2>
+
+            <pre id="result">
+Submit the form to see the result.
+            </pre>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 My Application</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+
+</body>
+</html>
+CSS — app/static/style.css
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #333;
+}
+
+.header {
+    text-align: center;
+    padding: 30px 20px;
+    background: #222;
+    color: white;
+}
+
+.header h1 {
+    margin-bottom: 8px;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #222;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #444;
+}
+
+#status {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+JavaScript — app/static/script.js
+const form = document.getElementById("userForm");
+const statusMessage = document.getElementById("status");
+const result = document.getElementById("result");
+
+form.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const userData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        message: document.getElementById("message").value
+    };
+
+    statusMessage.textContent = "Processing...";
+
+    try {
+
+        const response = await fetch("/process", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(userData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Something went wrong");
+        }
+
+        statusMessage.textContent = "Data processed successfully.";
+
+        result.textContent =
+            JSON.stringify(data, null, 2);
+
+    } catch (error) {
+
+        statusMessage.textContent =
+            "Error: " + error.message;
+
+        result.textContent = "";
+    }
+});
+FastAPI Static File Configuration
+
+Add this to app/main.py so FastAPI can serve the UI:
+
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+app = FastAPI()
+
+app.mount(
+    "/static",
+    StaticFiles(directory="app/static"),
+    name="static"
+)
+
+
+@app.get("/")
+def home():
+    return FileResponse("app/templates/index.html")
+Final Project Structure
+project/
+│
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   │
+│   ├── templates/
+│   │   └── index.html
+│   │
+│   └── static/
+│       ├── style.css
+│       └── script.js
+│
+└── requirements.txt
