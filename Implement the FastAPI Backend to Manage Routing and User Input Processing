@@ -1,0 +1,96 @@
+The FastAPI backend is implemented to manage application routing, receive and validate user input, process requests, and return appropriate responses. FastAPI provides a lightweight and efficient API framework with automatic request validation and documentation. The backend separates routing logic from application processing, making the system easier to maintain and extend.
+
+Coding
+
+main.py
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI(
+    title="User Input Processing API",
+    description="FastAPI backend for routing and user input processing",
+    version="1.0.0"
+)
+
+
+# Request model
+class UserInput(BaseModel):
+    name: str
+    email: str
+    message: str
+
+
+# Root route
+@app.get("/")
+def home():
+    return {
+        "message": "FastAPI Backend is running successfully"
+    }
+
+
+# Health-check route
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy"
+    }
+
+
+# User input processing route
+@app.post("/process")
+def process_user_input(data: UserInput):
+
+    if not data.name.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Name cannot be empty"
+        )
+
+    if not data.email.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Email cannot be empty"
+        )
+
+    if not data.message.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Message cannot be empty"
+        )
+
+    # Process user input
+    response = {
+        "name": data.name,
+        "email": data.email,
+        "message": data.message,
+        "status": "Input processed successfully"
+    }
+
+    return response
+Install Dependencies
+pip install fastapi uvicorn
+Run the Backend
+uvicorn main:app --reload
+
+The API will run at:
+
+http://127.0.0.1:8000
+API Documentation
+
+FastAPI automatically provides interactive API documentation:
+
+http://127.0.0.1:8000/docs
+Example Request
+{
+    "name": "Vennila",
+    "email": "vennila@example.com",
+    "message": "Hello from the application"
+}
+Example Response
+{
+    "name": "Vennila",
+    "email": "vennila@example.com",
+    "message": "Hello from the application",
+    "status": "Input processed successfully"
+}
